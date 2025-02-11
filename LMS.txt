@@ -1,0 +1,161 @@
+import java.util.Scanner;
+
+class Book {
+    String title;
+    String author;
+    int id;
+    Book next;
+
+    Book(int id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.next = null;
+    }
+}
+
+class Library {
+    private Book head;
+
+    public Library() {
+        head = null;
+    }
+
+    public void insertBook(Book newBook) {
+        if (head == null || head.id >= newBook.id) {
+            newBook.next = head;
+            head = newBook;
+        } else {
+            Book current = head;
+            while (current.next != null && current.next.id < newBook.id) {
+                current = current.next;
+            }
+            newBook.next = current.next;
+            current.next = newBook;
+        }
+    }
+
+    public void displayBooks() {
+        if (head == null) {
+            System.out.println("No books available in the library.");
+            return;
+        }
+        Book current = head;
+        while (current != null) {
+            System.out.println("ID: " + current.id + ", Title: " + current.title + ", Author: " + current.author);
+            current = current.next;
+        }
+    }
+
+    public Book searchByIdLinear(int id) {
+        Book current = head;
+        while (current != null) {
+            if (current.id == id) {
+                return current;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    public Book searchByIdBinary(int id) {
+        Book[] books = toArray();
+        int low = 0, high = books.length - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            if (books[mid].id == id) {
+                return books[mid];
+            } else if (books[mid].id < id) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return null;
+    }
+
+    private Book[] toArray() {
+        int size = 0;
+        Book current = head;
+        while (current != null) {
+            size++;
+            current = current.next;
+        }
+        Book[] books = new Book[size];
+        current = head;
+        int i = 0;
+        while (current != null) {
+            books[i++] = current;
+            current = current.next;
+        }
+        return books;
+    }
+}
+
+public class LibraryManagementSystem {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Library library = new Library();
+
+        while (true) {
+            System.out.println("\nLibrary Management System");
+            System.out.println("1. Add a Book");
+            System.out.println("2. Display All Books");
+            System.out.println("3. Search Book by ID (Linear Search)");
+            System.out.println("4. Search Book by ID (Binary Search)");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Book ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.print("Enter Book Title: ");
+                    String title = scanner.nextLine();
+                    System.out.print("Enter Book Author: ");
+                    String author = scanner.nextLine();
+                    Book newBook = new Book(id, title, author);
+                    library.insertBook(newBook);
+                    System.out.println("Book added successfully.");
+                    break;
+
+                case 2:
+                    library.displayBooks();
+                    break;
+
+                case 3:
+                    System.out.print("Enter Book ID to search: ");
+                    int searchIdLinear = scanner.nextInt();
+                    Book foundBookLinear = library.searchByIdLinear(searchIdLinear);
+                    if (foundBookLinear != null) {
+                        System.out.println("Book found: ID: " + foundBookLinear.id + ", Title: " + foundBookLinear.title + ", Author: " + foundBookLinear.author);
+                    } else {
+                        System.out.println("Book not found.");
+                    }
+                    break;
+
+                case 4:
+                    System.out.print("Enter Book ID to search: ");
+                    int searchIdBinary = scanner.nextInt();
+                    Book foundBookBinary = library.searchByIdBinary(searchIdBinary);
+                    if (foundBookBinary != null) {
+                        System.out.println("Book found: ID: " + foundBookBinary.id + ", Title: " + foundBookBinary.title + ", Author: " + foundBookBinary.author);
+                    } else {
+                        System.out.println("Book not found.");
+                    }
+                    break;
+
+                case 5:
+                    System.out.println("Exiting Library Management System.");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid choice, please try again.");
+            }
+        }
+    }
+}
